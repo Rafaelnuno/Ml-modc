@@ -1,11 +1,23 @@
-from sklearn.datasets import load_arff
-from sklearn.model_selection import train_test_split
+import arff
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score
 
-train_data_path = "path/to/nsl-kdd-dataset/KDDTrain+.arff"
-test_data_path = "path/to/nsl-kdd-dataset/KDDTest+.arff"
+with open("dataset/KDDTrain+.arff") as train_file:
+    train_data = arff.load(train_file)
+with open("dataset/KDDTest+.arff") as test_file:
+    test_data = arff.load(test_file)
 
-train_data, train_meta = load_arff(train_data_path)
-test_data, test_meta = load_arff(test_data_path)
+train_features = [row[:-1] for row in train_data['data']]
+train_labels = [row[-1] for row in train_data['data']]
 
+test_features = [row[:-1] for row in test_data['data']]
+test_labels = [row[-1] for row in test_data['data']]
+
+clf = DecisionTreeClassifier()
+
+clf.fit(train_features, train_labels)
+
+predictions = clf.predict(test_features)
+
+accuracy = accuracy_score(test_labels, predictions)
+print("Accuracy:", accuracy)
